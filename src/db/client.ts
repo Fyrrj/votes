@@ -1,17 +1,15 @@
 import { PrismaClient } from "@prisma/client";
 
-export const prisma = new PrismaClient();
-
-async function main() {
-  // ... you will write your Prisma Client queries here
+declare global {
+  // allow global `var` declarations
+  // eslint-disable-next-line no-var
+  var prisma: PrismaClient | undefined;
 }
 
-main()
-  .then(async () => {
-    await prisma.$disconnect();
-  })
-  .catch(async (e) => {
-    console.error(e);
-    await prisma.$disconnect();
-    process.exit(1);
+export const prisma =
+  global.prisma ||
+  new PrismaClient({
+    log: ["query"],
   });
+
+if (process.env.NODE_ENV !== "production") global.prisma = prisma;
